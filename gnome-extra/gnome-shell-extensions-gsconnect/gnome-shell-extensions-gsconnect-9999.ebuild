@@ -21,6 +21,7 @@ RDEPEND="${COMMON_DEPEND}
 	app-eselect/eselect-gnome-shell-extensions
 	>=dev-libs/gjs-1.48
 	>=gnome-base/gnome-shell-3.28
+	!gnome-extra/gnome-shell-extension-gsconnect
 	net-fs/sshfs
 	|| ( ( net-libs/gnome-online-accounts dev-libs/libgdata ) dev-libs/folks )
 	|| ( media-libs/libcanberra media-libs/gsound )
