@@ -70,7 +70,6 @@ DEPEND="${COMMON_DEPEND}
 # eautoreconf needs:
 #  app-text/yelp-tools
 
-
 src_prepare() {
 	gnome2_src_prepare
 
