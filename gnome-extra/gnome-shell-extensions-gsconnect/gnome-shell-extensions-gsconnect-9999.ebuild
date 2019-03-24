@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit git-r3 gnome2-utils meson readme.gentoo-r1
 
@@ -22,7 +22,7 @@ RDEPEND="${COMMON_DEPEND}
 	>=dev-libs/gjs-1.48
 	>=gnome-base/gnome-shell-3.28
 	!gnome-extra/gnome-shell-extension-gsconnect
-	net-fs/sshfs
+	gnome-base/gvfs
 	|| ( ( net-libs/gnome-online-accounts dev-libs/libgdata ) dev-libs/folks )
 	|| ( media-libs/libcanberra media-libs/gsound )
 	nautilus? (
@@ -30,9 +30,8 @@ RDEPEND="${COMMON_DEPEND}
 		gnome-base/nautilus[introspection]
 	)
 "
-DEPEND="${COMMON_DEPEND}
-	virtual/pkgconfig
-"
+DEPEND="${COMMON_DEPEND}"
+BDEPEND="virtual/pkgconfig"
 
 DISABLE_AUTOFORMATTING="yes"
 DOC_CONTENTS="For knowing more about how to do the setup, please visit:
