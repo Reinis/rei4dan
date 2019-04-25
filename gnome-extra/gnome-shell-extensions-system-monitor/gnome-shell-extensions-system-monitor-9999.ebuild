@@ -1,9 +1,9 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit gnome2 git-r3
+inherit gnome2-utils git-r3 readme.gentoo-r1
 
 DESCRIPTION="System monitor extension for GNOME Shell"
 HOMEPAGE="https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet"
@@ -18,26 +18,47 @@ IUSE=""
 COMMON_DEPEND="
 	>=dev-libs/glib-2.26
 	>=gnome-base/gnome-desktop-3.10:3
-	app-eselect/eselect-gnome-shell-extensions"
+	app-eselect/eselect-gnome-shell-extensions
+"
 RDEPEND="${COMMON_DEPEND}
 	gnome-base/gnome-desktop:3[introspection]
 	gnome-base/gnome-shell
 	media-libs/clutter:1.0[introspection]
 	net-libs/telepathy-glib[introspection]
 	x11-libs/gtk+:3[introspection]
-	x11-libs/pango[introspection]"
+	x11-libs/pango[introspection]
+"
 DEPEND="${COMMON_DEPEND}
+	gnome-base/gnome-common
+"
+BDEPEND="
 	sys-devel/gettext
-	>=dev-util/pkgconfig-0.22
+	virtual/pkgconfig
 	>=dev-util/intltool-0.26
-	gnome-base/gnome-common"
+"
+
+DOC_CONTENTS="The installed extensions are initially disabled by default.\n
+To change the system default and enable some extensions, you can use\n
+# eselect gnome-shell-extensions\n
+Alternatively, you can use the org.gnome.shell disabled-extensions\n
+gsettings key to change the disabled extension list per-user."
+
+MAKEOPTS="${MAKEOPTS} V=1"
 
 src_prepare() {
 	default
+	sed -i -e 's%$(DESTDIR)usr%$(DESTDIR)/usr%' "${S}/Makefile" || die "DESTDIR fix failed"
+	sed -i -e 's/SUDO=sudo/SUDO=/' "${S}/Makefile" || die "Removing sudo failed"
+	sed -i -e '/ -s reload/d' "${S}/Makefile" || die "Removing reload failed"
+	sed -i -e '/schemas\/gschemas.compiled _build\/schemas\//d' "${S}/Makefile" || die "Removing compiled copy failed"
 }
 
 src_configure() {
 	default
+}
+
+src_compile() {
+	:
 }
 
 src_install() {
@@ -55,18 +76,23 @@ src_install() {
 	# Clean up
 	rm -rf "${ED}${extension}/schemas"
 	rm -rf "${ED}${extension}/README"
+
+	readme.gentoo_create_doc
+}
+
+pkg_preinst() {
+	gnome2_schemas_savelist
 }
 
 pkg_postinst() {
-	gnome2_pkg_postinst
+	gnome2_schemas_update
 
-	einfo "Updating list of installed extensions"
-	eselect gnome-shell-extensions update || die
-	elog
-	elog "Installed extensions installed are initially disabled by default."
-	elog "To change the system default and enable some extensions, you can use"
-	elog "# eselect gnome-shell-extensions"
-	elog "Alternatively, you can use the org.gnome.shell disabled-extensions"
-	elog "gsettings key to change the disabled extension list per-user."
-	elog
+	ebegin "Updating list of installed extensions"
+	eselect gnome-shell-extensions update
+	eend $?
+	readme.gentoo_print_elog
+}
+
+pkg_postrm() {
+	gnome2_schemas_update
 }
